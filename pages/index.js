@@ -1,8 +1,45 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import StudentForm from "./../components/StudentForm";
+import { useState } from "react";
+import Head from "next/head";
+import Image from "next/image";
+import styles from "../styles/Home.module.css";
+import Student from "../components/Student";
 
 export default function Home() {
+  const [students, setStudents] = useState(["Tahmina", "Marina", "Alina"]);
+  const [studentName, setStudentName] = useState("");
+  // controlled component (input)
+  // 1. define state
+  // 2. pass the getter to the inputfield as value
+  // 3. Add an onChange listener and handler
+  // 4. Get the userinput with event.target.value
+  // 5. Call the setter with the updated value
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    // NOT LIKE THIS (most cases)
+    // const name = document.getElementById("studentName");
+    // console.log(name.value);
+    console.log("NEW STUDENT", studentName);
+    setStudents([...students, studentName]); // recommended way -> new array + we call the setter (will always rerender)
+    // setStudents(students.concat(studentName)); also works
+
+    // students.push(studentName); // NO! React does not register that rerender is needed, we need to call a setter to do that
+    setStudentName("");
+
+    console.log(students);
+    // clear the inputfield
+  }
+
+  function handleChange(event) {
+    console.log(event.target.value);
+    setStudentName(event.target.value);
+  }
+
+  function handleDelete(studentName) {
+    // call the setter here
+    setStudents(students.filter((student) => student != studentName));
+  }
   return (
     <div className={styles.container}>
       <Head>
@@ -12,46 +49,22 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+        <StudentForm
+          handleSubmit={handleSubmit}
+          studentName={studentName}
+          handleChange={handleChange}
+        />
+        <ul>
+          {students.map((student) => {
+            return (
+              <Student
+                name={student}
+                key={student}
+                handleDelete={handleDelete}
+              />
+            );
+          })}
+        </ul>
       </main>
 
       <footer className={styles.footer}>
@@ -60,12 +73,12 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
         </a>
       </footer>
     </div>
-  )
+  );
 }
